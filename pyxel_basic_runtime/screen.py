@@ -17,6 +17,9 @@ from py_basic_core.terminal import LineEditor, TerminalBuffer
 from . import commands, functions
 from .font import CHAR_W, LINE_H, Font
 from .graphics import GraphicsPlane
+from .gui import DESIGN_FUNCTION, GuiManager
+from .gui import commands as gui_commands
+from .gui.style import mouse_cursor
 from .host import PyxelHost
 from .input import Input
 
@@ -78,6 +81,8 @@ class BasicScreen:
         install_standard(self.runtime)
         commands.install(self.runtime, self)
         functions.install(self.runtime, self)
+        self.gui = GuiManager(self.font)
+        gui_commands.install(self.runtime, self.gui)
         self.line_editor = LineEditor()
         self.keys = deque()         # typed characters for INKEY$()
         self.result = None          # BasicResult once the screen is done
@@ -94,6 +99,9 @@ class BasicScreen:
                 self.runtime.load(source)
             except BasicSyntaxError as e:
                 self._show_error(e)
+            else:
+                # The GUI design made by the designer runs before the main program.
+                self.runtime.call_event(DESIGN_FUNCTION)
 
     def _create_planes(self):
         self.terminal = TerminalBuffer(pyxel.width // CHAR_W, pyxel.height // LINE_H,
@@ -176,6 +184,8 @@ class BasicScreen:
                 if ev.type in ("key", "text") or ev.type == "mouse_down":
                     self.result = self._pending_result
                 continue
+            if self.gui.handle(ev):
+                continue
             if self.typing:
                 self._edit_line(ev)
             elif ev.type == "text":
@@ -216,10 +226,14 @@ class BasicScreen:
     def step(self):
         """Run the program for one frame."""
         self._frame += 1
+        self.gui.update()
         if self.result is not None or self.phase != "run":
             return
         rt = self.runtime
+        self._start_gui_event()
         if rt.state not in (RunState.RUNNING, RunState.WAITING_FRAMES):
+            if rt.state == RunState.FINISHED:
+                self._after_run(rt.state)      # a GUI program ends when its windows are closed
             return
         deadline = time.perf_counter() + FRAME_TIME_LIMIT
         remaining = self.steps_per_frame
@@ -230,6 +244,20 @@ class BasicScreen:
             remaining -= CHUNK_STEPS
         self._after_run(state)
 
+    def _start_gui_event(self):
+        """Call the BASIC handler of a GUI event when the program is idle (GUI.md 5)."""
+        rt = self.runtime
+        if rt.in_event or not self.gui.pending:
+            return
+        if rt.state not in (RunState.WAITING_FRAMES, RunState.FINISHED):
+            return                              # the program is busy: the event waits
+        rt.call_event(self.gui.next_handler())
+
+    def _waiting_for_gui(self):
+        rt = self.runtime
+        return (not rt.ended_by_end
+                and (rt.in_event or self.gui.pending or self.gui.has_visible_windows()))
+
     def _after_run(self, state):
         if state == RunState.EXITED:
             self.result = BasicResult(EXITED)
@@ -238,6 +266,10 @@ class BasicScreen:
         elif self.mode == DIRECT:
             self.repl.finish()
             self.phase = "line"
+        elif state == RunState.FINISHED and self._waiting_for_gui():
+            return                              # windows are open: wait for events
+        elif state == RunState.FINISHED and self.gui.used and not self.runtime.ended_by_end:
+            self.result = BasicResult(ENDED)    # the last window was closed
         elif state == RunState.FINISHED:
             self._new_line()
             self.terminal.write(END_MESSAGE)
@@ -272,6 +304,9 @@ class BasicScreen:
             self._draw_line_editor()
         elif self.phase == "any_key":
             self._draw_caret(term.row, term.col, "")
+        self.gui.draw()
+        if self.gui.has_visible_windows() and not self.mouse_visible:
+            mouse_cursor(pyxel.mouse_x, pyxel.mouse_y)
 
     def _draw_line_editor(self):
         ed = self.line_editor

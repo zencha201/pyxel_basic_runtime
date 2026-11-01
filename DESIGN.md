@@ -1,7 +1,7 @@
 # DESIGN.md — BASIC + Pyxel
 
 本書は、BASIC コアを Pyxel の上で動かすパッケージ（本パッケージ）の設計書である。
-使い方は [README.md](README.md)、Pyxel 版の命令・関数は [COMMANDS.md](COMMANDS.md)、言語仕様は [core/BASIC.md](https://github.com/zencha201/py_basic_core/blob/main/BASIC.md)、コアの設計は [core/DESIGN.md](https://github.com/zencha201/py_basic_core/blob/main/DESIGN.md) を参照。
+使い方は [README.md](README.md)、Pyxel 版の命令・関数は [COMMANDS.md](COMMANDS.md)、GUI（ウィンドウと部品）は [GUI.md](GUI.md)、言語仕様は [core/BASIC.md](https://github.com/zencha201/py_basic_core/blob/main/BASIC.md)、コアの設計は [core/DESIGN.md](https://github.com/zencha201/py_basic_core/blob/main/DESIGN.md) を参照。
 
 - 実行基盤: Python 3.10 以降 / Pyxel 2.x（2.9.9 で動作確認）
 - 使われ方: 単体の BASIC アプリとして動かす（7）ほか、エディタなどのアプリに BASIC 画面として組み込む（8）。
@@ -25,6 +25,7 @@
 │   ├── graphics.py             GraphicsPlane（グラフィック面）
 │   ├── commands.py             CLS TEXT LINE PSET RECT RECTB CIRC CIRCB LOAD BLT IMGSET MOUSE WAIT
 │   ├── functions.py            PGET BTN BTNP INKEY$ MOUSEX MOUSEY SCREENW SCREENH
+│   ├── gui/                    ウィンドウと部品（GUI.md）
 │   ├── font.py                 Font（umplus_j12r.bdf の読み込み・文字幅・描画）
 │   ├── input.py                Input / Event（キー・文字・クリックをフレームごとのイベントに）
 │   ├── app.py                  BasicApp（単体で動かすときのアプリ）
@@ -34,7 +35,7 @@
 ├── tests/                      pytest
 ├── tools/build_pyxapp.py       pyxel_basic_runtime.pyxapp の作成
 ├── pyxel_basic_runtime.pyxapp  生成物（コードを修正したら作り直す）
-├── COMMANDS.md / DESIGN.md / README.md / LICENSE
+├── COMMANDS.md / GUI.md / DESIGN.md / README.md / LICENSE
 └── pytest.ini
 ```
 
@@ -78,8 +79,8 @@ BASIC プログラムを別スレッドで動かさず、**Pyxel のフレーム
 |---|---|
 | `RUNNING` | 次のフレームで続きを実行 |
 | `WAITING_INPUT` | インライン入力を受け付け、確定したら `provide_input()` |
-| `WAITING_FRAMES` | `WAIT n` の間、毎フレーム 1 つ数える |
-| `FINISHED` / `ERROR` | プログラム実行: メッセージを出してキー待ち（4）。ダイレクト実行: `READY.` に戻る |
+| `WAITING_FRAMES` | `WAIT n` の間、毎フレーム 1 つ数える（`MSGBOX` の待ちもこの状態。GUI のイベントはこの間に呼ぶ） |
+| `FINISHED` / `ERROR` | プログラム実行: メッセージを出してキー待ち（4）。ウィンドウを表示中ならイベント待ち（GUI.md 5）。ダイレクト実行: `READY.` に戻る |
 | `EXITED` | ダイレクト実行を終える（4） |
 
 - グラフィック命令は即座にグラフィック面へ描き、画面への反映は毎フレームの `draw()` で行う（FLIP 不要）。
@@ -91,7 +92,7 @@ BASIC 画面は、終わると `result`（`BasicResult(kind, message, line)`）�
 
 | `kind` | いつ | 画面の動き |
 |---|---|---|
-| `ended` | プログラムが END / ソース終端に達した | `OK - PRESS ANY KEY` を出し、キー（またはクリック）を待ってから設定する |
+| `ended` | プログラムが END / ソース終端に達した | `OK - PRESS ANY KEY` を出し、キー（またはクリック）を待ってから設定する。GUI のプログラムが最後のウィンドウを閉じて終わったときは、キーを待たずに設定する |
 | `error` | 構文エラー・実行時エラー | `?TYPE MISMATCH IN 12` と `PRESS ANY KEY` を出してキー待ち。`message` と `line`（ソースの行番号）を持つ |
 | `stopped` | F5 / F6 が押された（`stop()`） | すぐに設定する |
 | `exited` | ダイレクト実行で `EXIT` | すぐに設定する |
@@ -122,7 +123,8 @@ BASIC 画面は、終わると `result`（`BasicResult(kind, message, line)`）�
 ## 6. 部品
 - **BasicScreen（screen.py）**: BASIC 画面全体の制御。状態（phase）は `run`（実行中・INPUT 待ち）/ `line`（ダイレクト実行の入力待ち）/ `any_key`（終了・エラー後のキー待ち）。描画順は `cls(0)` → グラフィック面 → テキスト面の文字 → 入力中の文字列とカーソル。
 - **Font（font.py）**: `umplus_j12r.bdf` を読み込み、文字幅の計測（フォントにない文字は互換文字か `?` / `〓` で代用）と描画を行う。探す順は `assets/` → Pyxel パッケージ同梱のサンプル素材。読み込みに時間がかかるので、既定のフォントは 1 つを全画面で共有する（`default_font()`）。
-- **Input（input.py）**: 編集キー（キーリピート付き）・F5 / F6・文字入力・クリックを、フレームごとの `Event` の列にする。
+- **Input（input.py）**: 編集キー（キーリピート付き）・F5 / F6・文字入力・マウス（押す・動かす・離す。座標付き）を、フレームごとの `Event` の列にする。キーのイベントは Shift の状態も持つ。
+- **GUI（gui/）**: ウィンドウと部品（[GUI.md](GUI.md)）。入力はまず `GuiManager.handle()` に渡し、使われなかったものだけ BASIC 画面が使う。描画はテキスト面の上。
 - **GraphicsPlane（graphics.py）**: 画面と同じ大きさの `pyxel.Image`。描画命令はこの画像に描く。
 - **命令・関数（commands.py / functions.py）**: [COMMANDS.md](COMMANDS.md) の命令・関数を `install(runtime, screen)` でコアに登録する。
   - 色番号は 0〜15 以外を `ILLEGAL FUNCTION CALL` とする。`BTN` / `BTNP` はキー名の文字列で指定する。

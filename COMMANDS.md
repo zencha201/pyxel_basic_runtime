@@ -72,6 +72,25 @@ BASIC の言語仕様（文・式・標準関数）は [core/BASIC.md](https://g
 | `SCREENW()` / `SCREENH()` | 画面（グラフィック面）の幅と高さ（ドット）。画面サイズによって変わる（単体で動かすときは 256×240） |
 
 
+## 4. GUI の命令と関数
+ウィンドウとボタンなどの部品を使う命令と関数。詳しい仕様（部品の種類・プロパティ・イベント・プログラムの流れ）は [GUI.md](GUI.md) を参照。
+
+| 命令 | 説明 |
+|---|---|
+| `WINDOW name$,title$,x,y,w,h` | ウィンドウを作る（表示はしない）。w / h はクライアント領域の大きさ |
+| `WIDGET win$,type$,name$,x,y,w,h` | ウィンドウに部品を置く。type$ は `BUTTON` `CHECKBOX` `RADIO` `LABEL` `TEXTFIELD` `TEXTAREA`（と Python で追加した種類） |
+| `PROPERTY name$,prop$,v` / `SETPROP name$,prop$,v` | プロパティを設定する（どちらも同じ） |
+| `HANDLER name$,event$,func$` | イベント（`CLICK` `CHANGE` `ENTER` `CLOSE`）で呼ぶ、引数のない関数を設定する |
+| `SHOW win$` / `HIDE win$` | ウィンドウを表示する（いちばん手前へ） / 隠す |
+| `MSGBOX s[,title$]` | メッセージのウィンドウを出し、OK が押されるまで待つ |
+
+| 関数 | 説明 |
+|---|---|
+| `GETPROP(name$,prop$)` / `GETPROP$(name$,prop$)` | 数値 / 文字列のプロパティの値 |
+
+- 関数 `GUI_DESIGN()` があれば、メインプログラムより先に呼ばれる（GUI デザイナが作る部分）。
+- ウィンドウを表示したプログラムは、メインプログラムが終わるとイベント待ちになり、`END` か、最後のウィンドウを閉じると終わる。
+
 ## 付録. BTN / BTNP のキー名
 大文字小文字は区別しない。
 
