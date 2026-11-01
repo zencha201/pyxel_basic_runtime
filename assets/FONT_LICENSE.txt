@@ -1,0 +1,28 @@
+umplus_j12r.bdf
+===============
+
+入手元 / Source
+  Pyxel パッケージ同梱のサンプル素材（pyxel/examples/assets/umplus_j12r.bdf）を
+  無改変で同梱しています。
+  Bundled unmodified from the sample assets of the Pyxel package.
+
+構成 / Contents
+  このファイルは 2 つの BDF フォントを連結したものです。
+  This file is a concatenation of two BDF fonts:
+    1. 日本語 12 ドットフォント  FOUNDRY "umplus" / FAMILY "gothic"
+       COPYRIGHT "Copyright (C) 2002-2004 COZ"
+    2. 欧文 6x12 ドットフォント  FOUNDRY "mplus" / FAMILY "fxd"
+       COPYRIGHT "Copyright (C) 2002-2004 COZ"
+
+利用条件 / License
+  フォントファイル内に記載されている利用条件（原文のまま）:
+  License notice embedded in the font file (verbatim):
+
+    This font is a free software.
+    Unlimited permission is granted to use, copy, and distribute it,
+    with or without modification, either commercially and noncommercially.
+    THIS FONT IS PROVIDED "AS IS" WITHOUT WARRANTY.
+
+  （参考訳）本フォントはフリーソフトウェアです。改変の有無、商用・非商用を問わず、
+  使用・複製・配布することを無制限に許可します。本フォントは「現状のまま」提供され、
+  いかなる保証もありません。
