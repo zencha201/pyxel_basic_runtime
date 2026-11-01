@@ -2,7 +2,7 @@
 
 import pyxel
 
-from .core.errors import ILLEGAL_FUNCTION_CALL
+from py_basic_core.errors import ILLEGAL_FUNCTION_CALL
 
 # Key names accepted by BTN / BTNP (COMMANDS.md appendix).
 KEY_CODES = {c: getattr(pyxel, "KEY_" + c) for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"}

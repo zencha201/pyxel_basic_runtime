@@ -9,29 +9,31 @@
 ---
 
 ## 1. 目的と構成
-- BASIC コア（`core/`）に、Pyxel による画面（文字とグラフィック）・キー入力・描画命令を組み合わせ、レトロ PC 風の BASIC 環境にする。
+- BASIC コア（`py_basic_core`）に、Pyxel による画面（文字とグラフィック）・キー入力・描画命令を組み合わせ、レトロ PC 風の BASIC 環境にする。
 - **依存の規則**
-  - 依存するのは `core/`（BASIC コア）と Pyxel だけ。エディタや UI 部品には依存しない。フォントの読み込みとキー入力も本パッケージの中に持つ。
-  - パッケージ内はすべて相対 import にしているので、どのフォルダ名で置いても動く（例: エディタの中の `basic`）。
+  - 依存するのは `py_basic_core`（BASIC コア）と Pyxel だけ。エディタや UI 部品には依存しない。フォントの読み込みとキー入力も本パッケージの中に持つ。
+  - パッケージ名は `pyxel_basic_runtime`。本パッケージの中は相対 import、コアは `py_basic_core` として import する。
+  - 使う側は、リポジトリのフォルダ（`pyxel_basic_runtime` を import するため）と `core/`（`py_basic_core` を import するため）を `sys.path` に入れる。`main.py` とテストはこれを自分で行う。
   - `core/` は別のリポジトリ（[py_basic_core](https://github.com/zencha201/py_basic_core)）を git のサブモジュールとして取り込んだもの。本パッケージからは参照するだけで、変更はコアのリポジトリで行い、その後こちらで参照先を更新してコミットする。取得は `git clone --recursive`。
 
 ```
-（パッケージのフォルダ）
-├── __init__.py         公開 API（BasicScreen, BasicResult, Font, Input, Event, 状態の名前）
-├── screen.py           BasicScreen（BASIC 画面：入力・実行・描画・中断・再開）
-├── host.py             PyxelHost（コアの Host の実装：文字画面のモデルへ出力）
-├── graphics.py         GraphicsPlane（グラフィック面）
-├── commands.py         CLS TEXT LINE PSET RECT RECTB CIRC CIRCB LOAD BLT IMGSET MOUSE WAIT
-├── functions.py        PGET BTN BTNP INKEY$ MOUSEX MOUSEY SCREENW SCREENH
-├── font.py             Font（umplus_j12r.bdf の読み込み・文字幅・描画）
-├── input.py            Input / Event（キー・文字・クリックをフレームごとのイベントに）
-├── app.py              BasicApp（単体で動かすときのアプリ）
-├── main.py             起動スクリプト
-├── assets/             umplus_j12r.bdf（フォント）と利用条件
-├── core/               BASIC コア（別リポジトリ py_basic_core のサブモジュール）
-├── tests/              pytest
-├── tools/build_pyxapp.py  basic.pyxapp の作成（テスト・ドキュメント・git のファイルを除く）
-├── basic.pyxapp        生成物（コードを修正したら作り直す）
+（リポジトリ）
+├── pyxel_basic_runtime/        パッケージ
+│   ├── __init__.py             公開 API（BasicScreen, BasicResult, Font, Input, Event, 状態の名前）
+│   ├── screen.py               BasicScreen（BASIC 画面：入力・実行・描画・中断・再開）
+│   ├── host.py                 PyxelHost（コアの Host の実装：文字画面のモデルへ出力）
+│   ├── graphics.py             GraphicsPlane（グラフィック面）
+│   ├── commands.py             CLS TEXT LINE PSET RECT RECTB CIRC CIRCB LOAD BLT IMGSET MOUSE WAIT
+│   ├── functions.py            PGET BTN BTNP INKEY$ MOUSEX MOUSEY SCREENW SCREENH
+│   ├── font.py                 Font（umplus_j12r.bdf の読み込み・文字幅・描画）
+│   ├── input.py                Input / Event（キー・文字・クリックをフレームごとのイベントに）
+│   ├── app.py                  BasicApp（単体で動かすときのアプリ）
+│   └── assets/                 umplus_j12r.bdf（フォント）と利用条件
+├── core/                       BASIC コア（別リポジトリ py_basic_core のサブモジュール。中の py_basic_core/ がパッケージ）
+├── main.py                     起動スクリプト
+├── tests/                      pytest
+├── tools/build_pyxapp.py       pyxel_basic_runtime.pyxapp の作成
+├── pyxel_basic_runtime.pyxapp  生成物（コードを修正したら作り直す）
 ├── COMMANDS.md / DESIGN.md / README.md / LICENSE
 └── pytest.ini
 ```
@@ -139,14 +141,15 @@ python main.py              # ダイレクト実行
 - 画面は 256×240、タイトルは `BASIC`。Esc ではアプリを終了しない（BASIC のプログラムが Esc キーを使えるように）。
 - BAS ファイルの文字コードは UTF-8（BOM 付きを含む）、だめなら Shift_JIS 系（cp932）として読む。見つからないファイルを指定したら、エラーを表示して終了コード 1 で終わる。
 - `LOAD` の基準フォルダは、実行する BAS ファイルのフォルダ。
-- `main.py` は、フォルダ名に関係なく本パッケージを `basic` という名前で読み込んでから `app.main()` を呼ぶ。
-- `.pyxapp` にした場合（`pyxel play` は `.pyxapp` 以外の引数を受け付けない）は、ダイレクト実行で始まる。
+- `main.py` は、リポジトリのフォルダと `core/` を `sys.path` に入れてから `pyxel_basic_runtime.app.main()` を呼ぶ。
+- `.pyxapp`（`tools/build_pyxapp.py` で作る）には `main.py` と 2 つのパッケージ（`pyxel_basic_runtime`、`py_basic_core`）だけを入れる。テスト・ドキュメント・git のファイルは入らない。`.pyxapp` にした場合（`pyxel play` は `.pyxapp` 以外の引数を受け付けない）は、ダイレクト実行で始まる。
 
 ---
 
 ## 8. ほかのアプリへの組み込み
 ```python
-from basic import DIRECT, PROGRAM, BasicScreen
+# リポジトリのフォルダと core/ を sys.path に入れておく
+from pyxel_basic_runtime import DIRECT, PROGRAM, BasicScreen
 
 screen = BasicScreen(PROGRAM, source, steps_per_frame=20000, max_call_depth=1000,
                      base_dir=folder_of_the_program, font=None, input=None)
@@ -164,6 +167,6 @@ if screen.result is not None:
 ---
 
 ## 9. テスト
-- `tests/` を pytest で実行する（このフォルダで `python -m pytest`）。`tests/conftest.py` がフォルダ名に関係なく本パッケージを `basic` として読み込み、headless の `BasicApp` を 1 つ作る（Pyxel の初期化は 1 回だけ）。
+- `tests/` を pytest で実行する（リポジトリのフォルダで `python -m pytest`）。`tests/conftest.py` がリポジトリのフォルダと `core/` を `sys.path` に入れ、headless の `BasicApp` を 1 つ作る（Pyxel の初期化は 1 回だけ）。
 - `test_screen.py`: 終了・INPUT・エラー・中断・ダイレクト実行と再開・配色。`test_commands.py`: Pyxel の命令・関数。`test_app.py`: 単体で動かすときの引数・文字コード・終了。
 - コアのテストはコアのリポジトリ（`core/tests/`）にある。

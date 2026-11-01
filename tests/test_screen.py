@@ -3,7 +3,7 @@
 import pyxel
 from helpers import key, make_screen, run_frames, text, type_line
 
-from basic import DIRECT, ENDED, ERROR, STOPPED
+from pyxel_basic_runtime import DIRECT, ENDED, ERROR, STOPPED
 
 
 def finish(screen):

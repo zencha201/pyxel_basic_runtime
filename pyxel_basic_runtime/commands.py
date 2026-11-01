@@ -4,8 +4,8 @@ import os
 
 import pyxel
 
-from .core import WaitFrames
-from .core.errors import FILE_NOT_FOUND, ILLEGAL_FUNCTION_CALL
+from py_basic_core import WaitFrames
+from py_basic_core.errors import FILE_NOT_FOUND, ILLEGAL_FUNCTION_CALL
 
 PALETTE_SIZE = 16
 HEX_DIGITS = frozenset("0123456789abcdefABCDEF")

@@ -11,10 +11,10 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pyxel
+from py_basic_core import BasicSyntaxError, ReplSession, Runtime, RunState, install_standard
+from py_basic_core.terminal import LineEditor, TerminalBuffer
 
 from . import commands, functions
-from .core import BasicSyntaxError, ReplSession, Runtime, RunState, install_standard
-from .core.terminal import LineEditor, TerminalBuffer
 from .font import CHAR_W, LINE_H, Font
 from .graphics import GraphicsPlane
 from .host import PyxelHost

@@ -1,8 +1,9 @@
 """BASIC on Pyxel: the BASIC screen and the Pyxel commands (DESIGN.md 1).
 
-The language itself is the ``core`` sub-package, which does not use Pyxel.
-All imports inside the package are relative, so it works under any folder
-name (for example as ``basic`` inside an editor, or on its own).
+The language itself is the ``py_basic_core`` package (a separate repository,
+included as the ``core`` submodule), which does not use Pyxel. Both packages
+must be importable: put this repository's folder and ``core/`` on sys.path
+(main.py and the tests do so).
 """
 
 from .font import Font

@@ -1,29 +1,19 @@
 """Start-up script: python main.py [program.bas]
 
 Runs the BASIC program when a file is given, otherwise starts direct mode.
-The package is loaded from this folder whatever the folder is called.
+The package pyxel_basic_runtime is in this folder and py_basic_core in the
+core/ submodule; in a .pyxapp both sit next to this file.
 """
 
-import importlib.util
 import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PACKAGE = "basic"
+for _folder in (os.path.join(HERE, "core"), HERE):
+    if os.path.isdir(_folder) and _folder not in sys.path:
+        sys.path.insert(0, _folder)
 
-
-def load_package():
-    if PACKAGE in sys.modules:
-        return sys.modules[PACKAGE]
-    spec = importlib.util.spec_from_file_location(
-        PACKAGE, os.path.join(HERE, "__init__.py"), submodule_search_locations=[HERE])
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[PACKAGE] = module
-    spec.loader.exec_module(module)
-    return module
-
+from pyxel_basic_runtime.app import main  # noqa: E402
 
 if __name__ == "__main__":
-    load_package()
-    from basic.app import main
     sys.exit(main())

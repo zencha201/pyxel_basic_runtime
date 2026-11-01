@@ -6,17 +6,17 @@ import sys
 
 from helpers import key, run_frames, type_line
 
-from basic import DIRECT, PROGRAM
-from basic.app import program_path, read_source
+from pyxel_basic_runtime import DIRECT, PROGRAM
+from pyxel_basic_runtime.app import program_path, read_source
 
-PACKAGE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def test_program_path():
     assert program_path(["main.py"]) is None
     assert program_path(["main.py", "game.bas"]) == "game.bas"
     assert program_path(["main.py", "-x", "game.bas"]) == "game.bas"
-    assert program_path(["pyxel", "play", "basic.pyxapp"]) is None
+    assert program_path(["pyxel", "play", "pyxel_basic_runtime.pyxapp"]) is None
 
 
 def test_read_source_encodings(tmp_path):
@@ -49,6 +49,6 @@ def test_direct_mode_without_a_file(basic_app):
 
 
 def test_missing_file_is_reported():
-    result = subprocess.run([sys.executable, os.path.join(PACKAGE_DIR, "main.py"), "no_such.bas"],
+    result = subprocess.run([sys.executable, os.path.join(REPO_DIR, "main.py"), "no_such.bas"],
                             capture_output=True, text=True, timeout=60)
     assert result.returncode == 1 and "File not found: no_such.bas" in result.stderr
