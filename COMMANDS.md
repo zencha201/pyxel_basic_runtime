@@ -91,6 +91,20 @@ BASIC の言語仕様（文・式・標準関数）は [core/BASIC.md](https://g
 - 関数 `GUI_DESIGN()` があれば、メインプログラムより先に呼ばれる（GUI デザイナが作る部分）。
 - ウィンドウを表示したプログラムは、メインプログラムが終わるとイベント待ちになり、`END` か、最後のウィンドウを閉じると終わる。
 
+## 5. HTTP / HTTPS のリクエスト
+BASIC コアの `HTTP` 命令と `HTTPSTATUS()` / `HTTPBODY$()` を、BASIC 画面では常に使えるようにしている（`install_http`）。仕様は [core/BASIC.md](https://github.com/zencha201/py_basic_core/blob/main/BASIC.md) 6.1。
+
+```basic
+DICT REQ$, RES$
+REQ$("name") = "TARO"
+HTTP "POST", URL$, REQ$, RES$          ' JSON で送り、返事の JSON を RES$ に平らにして受け取る
+PRINT HTTPSTATUS(); " "; RES$("user.name")
+```
+
+- 返事を待つ間も画面の描画は続き、F5 / F6 で中断できる。GUI のイベントも、`WAIT` 中と同じように呼ばれる。
+- フォーム形式で送るときは、ヘッダの DICT に `H$("Content-Type") = "application/x-www-form-urlencoded"` を入れて 5 番目の引数に渡す。
+- つながらないときやタイムアウト（10 秒）は `NETWORK ERROR`。Web ブラウザで動かしたときは使えない（`NETWORK ERROR`）。
+
 ## 付録. BTN / BTNP のキー名
 大文字小文字は区別しない。
 

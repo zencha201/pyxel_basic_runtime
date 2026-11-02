@@ -11,7 +11,8 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pyxel
-from py_basic_core import BasicSyntaxError, ReplSession, Runtime, RunState, install_standard
+from py_basic_core import (BasicSyntaxError, ReplSession, Runtime, RunState, install_http,
+                           install_standard)
 from py_basic_core.terminal import LineEditor, TerminalBuffer
 
 from . import commands, functions
@@ -79,6 +80,7 @@ class BasicScreen:
         self._create_planes()
         self.runtime = Runtime(PyxelHost(self.terminal), max_call_depth)
         install_standard(self.runtime)
+        install_http(self.runtime)              # always on (COMMANDS.md 5)
         commands.install(self.runtime, self)
         functions.install(self.runtime, self)
         self.gui = GuiManager(self.font)
