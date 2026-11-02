@@ -123,7 +123,7 @@ BASIC 画面は、終わると `result`（`BasicResult(kind, message, line)`）�
 ## 6. 部品
 - **BasicScreen（screen.py）**: BASIC 画面全体の制御。状態（phase）は `run`（実行中・INPUT 待ち）/ `line`（ダイレクト実行の入力待ち）/ `any_key`（終了・エラー後のキー待ち）。描画順は `cls(0)` → グラフィック面 → テキスト面の文字 → 入力中の文字列とカーソル。
 - **Font（font.py）**: `umplus_j12r.bdf` を読み込み、文字幅の計測（フォントにない文字は互換文字か `?` / `〓` で代用）と描画を行う。探す順は `assets/` → Pyxel パッケージ同梱のサンプル素材。読み込みに時間がかかるので、既定のフォントは 1 つを全画面で共有する（`default_font()`）。
-- **Input（input.py）**: 編集キー（キーリピート付き）・F5 / F6・文字入力・マウス（押す・動かす・離す。座標付き）を、フレームごとの `Event` の列にする。キーのイベントは Shift の状態も持つ。
+- **Input（input.py）**: 編集キー（キーリピート付き）・F5 / F6・文字入力・マウス（押す・動かす・離す・ホイール。座標付き）を、フレームごとの `Event` の列にする。キーのイベントは Shift の状態も持つ。
 - **GUI（gui/）**: ウィンドウと部品（[GUI.md](GUI.md)）。入力はまず `GuiManager.handle()` に渡し、使われなかったものだけ BASIC 画面が使う。描画はテキスト面の上。
 - **GraphicsPlane（graphics.py）**: 画面と同じ大きさの `pyxel.Image`。描画命令はこの画像に描く。
 - **命令・関数（commands.py / functions.py）**: [COMMANDS.md](COMMANDS.md) の命令・関数を `install(runtime, screen)` でコアに登録する。

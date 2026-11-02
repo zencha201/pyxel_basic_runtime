@@ -22,6 +22,10 @@ def install(runtime, gui, check_handlers=True):
         except PropertyError as e:
             if e.kind == "type":
                 raise ctx.error(TYPE_MISMATCH, str(e))
+            if e.kind == "value":
+                raise ctx.error(ILLEGAL_FUNCTION_CALL, "bad value " + str(e))
+            if e.kind == "readonly":
+                raise ctx.error(ILLEGAL_FUNCTION_CALL, "read-only property " + str(e))
             raise ctx.error(ILLEGAL_FUNCTION_CALL, "no property " + str(e))
 
     def name_arg(ctx, value):

@@ -27,7 +27,8 @@ END FUNCTION
 | ファイル | 役割 |
 |---|---|
 | `widget.py` | 部品の基底クラス `Widget`、プロパティの定義 `PropertySpec`、共通のプロパティ |
-| `widgets.py` | 標準の部品（3 章） |
+| `widgets.py` | 標準の部品（3 章）のうち、ボタン・チェックボックス・ラジオボタン・ラベル・テキストフィールド・テキストエリア |
+| `listbox.py` / `picture.py` / `scrollbar.py` | リストボックス / ピクチャボックス / 横・縦スクロールバー |
 | `window.py` | ウィンドウ `GuiWindow` と、`MSGBOX` のウィンドウ `MessageWindow` |
 | `manager.py` | `GuiManager`: プログラムのすべてのウィンドウ・部品・ハンドラ、重なり順、入力の振り分け、イベントの待ち行列 |
 | `commands.py` | BASIC の命令・関数（4 章）を `install(runtime, gui)` でコアに登録する |
@@ -41,7 +42,7 @@ END FUNCTION
 
 - タイトルバー（タイトルと閉じるボックス `×`）と、部品を置くクライアント領域からなる。
 - `WINDOW` で作った時点では表示されない。`SHOW` で表示し、`HIDE` で隠す。
-- プロパティ: `TITLE$`（タイトル）、`X` `Y`（画面上の左上の位置）、`W` `H`（**クライアント領域**の幅と高さ）、`VISIBLE`。部品の位置はクライアント領域の左上からの座標。
+- プロパティ: `TITLE`（タイトル）、`X` `Y`（画面上の左上の位置）、`W` `H`（**クライアント領域**の幅と高さ）、`VISIBLE`。部品の位置はクライアント領域の左上からの座標。
 - イベント: `CLOSE`（閉じるボックスが押された。ウィンドウは隠れたあとで呼ばれる）。
 - 表示中のウィンドウは重なり順を持ち、いちばん手前のウィンドウ（アクティブ）がキーボードの入力を受け取る。クリックしたウィンドウが手前に来る。
 - タイトルバーをドラッグすると移動できる。
@@ -60,6 +61,15 @@ END FUNCTION
 | `LABEL` ラベル | `TEXT`（"LABEL"）、`COLOR`（0。0〜15） | なし | — |
 | `TEXTFIELD` テキストフィールド | `TEXT`（""）、`MAXLEN`（0 = 制限なし）、`READONLY`（0 / 1） | `CHANGE`（文字が変わった）、`ENTER`（Enter が押された） | 文字の入力、Backspace / Delete、← → Home End、クリックでカーソル移動 |
 | `TEXTAREA` テキストエリア | `TEXT`（""。改行は `CHR$(10)`）、`READONLY`（0 / 1） | `CHANGE` | テキストフィールドと同じ。Enter で改行、↑ ↓ で行の移動 |
+| `LISTBOX` リストボックス | `ITEMS`（""。項目を `CHR$(10)` で区切る）、`INDEX`（-1。選んだ項目の番号、0 から）、`ITEM`（選んだ項目の文字列）※、`COUNT`（項目の数）※ | `CHANGE`（選んだ項目が変わった）、`ENTER`（ダブルクリック・Enter） | クリックで選ぶ、↑ ↓ PageUp PageDown Home End、マウスホイール・右端のスクロールバーでスクロール |
+| `PICTUREBOX` ピクチャボックス | `IMAGE`（0。イメージバンク 0〜2）、`U` `V`（0。バンクの中の左上）、`COLKEY`（-1。透明色、-1 はなし）、`BGCOLOR`（0。背景色）、`BORDER`（1。枠の 0 / 1）、`MOUSEX` `MOUSEY`（クリックした位置）※ | `CLICK`（押した）、`DRAG`（押したまま動かした） | — |
+| `HSCROLLBAR` 横スクロールバー / `VSCROLLBAR` 縦スクロールバー | `VALUE`（0）、`MIN`（0）、`MAX`（100）、`STEP`（1。矢印の 1 回の量）、`PAGE`（10。つまみの外をクリックしたときの量・つまみの大きさ） | `CHANGE`（値が変わった） | 矢印（押し続けるとくり返す）、つまみのドラッグ、つまみの外のクリック、← → / ↑ ↓、PageUp PageDown Home End、マウスホイール |
+
+※ は読み取り専用（`GETPROP` / `GETPROP$` で読むだけ。`SETPROP` すると `ILLEGAL FUNCTION CALL`。GUI デザイナにも表示しない）。
+
+- **リストボックス**: `ITEMS` が `""` なら項目なし。`INDEX` に -1〜項目数-1 以外を入れると `ILLEGAL FUNCTION CALL`。`ITEMS` を変えて `INDEX` の項目がなくなったときは -1 になる。項目を足すには `SETPROP "L", "ITEMS", GETPROP$("L", "ITEMS") + CHR$(10) + "新しい項目"`（空のときは `CHR$(10)` を付けない）。
+- **ピクチャボックス**: イメージバンク `IMAGE` の (`U`, `V`) から、ピクチャボックスと同じ大きさの範囲を表示する。絵は `LOAD`（リソースファイル）や `IMGSET` で用意し、毎フレーム描き直すので、バンクを書き換えるとすぐに表示が変わる。`MOUSEX` `MOUSEY` はピクチャボックスの左上からの位置で、ハンドラが呼ばれるまでに次の操作があれば新しい位置になる。GUI デザイナでは絵の代わりに × 印を表示する。
+- **スクロールバー**: `VALUE` は `MIN`〜`MAX` に収める（範囲外の値を入れると端の値になる。`MIN` `MAX` を変えたときも同じ）。`STEP` `PAGE` は 1 以上。
 
 - プログラムから `SETPROP` で値を変えたときは、その部品のイベントは起きない。ただし、ラジオボタンの `VALUE` を 1 にしたときにオフになった同じグループのボタンには `CHANGE` が起きる。
 - `READONLY` が 1 のときも、カーソルの移動はできる。
@@ -85,7 +95,7 @@ END FUNCTION
 | `GETPROP$(名前$, プロパティ$)` | 文字列のプロパティの値 |
 
 - ウィンドウの `VISIBLE` を `SETPROP` で変えると `SHOW` / `HIDE` と同じ。
-- エラー: ないウィンドウ・部品・種類・プロパティ・イベント、名前の重なり、0 / 1 や 0〜15 以外の値は `ILLEGAL FUNCTION CALL`。数値と文字列の取り違え（`GETPROP` で文字列のプロパティを読むなど）は `TYPE MISMATCH`。`HANDLER` の関数がなければ `UNDEFINED FUNCTION`。
+- エラー: ないウィンドウ・部品・種類・プロパティ・イベント、名前の重なり、0 / 1 や 0〜15 などの決まった値以外、読み取り専用のプロパティへの設定は `ILLEGAL FUNCTION CALL`。数値と文字列の取り違え（`GETPROP` で文字列のプロパティを読むなど）は `TYPE MISMATCH`。`HANDLER` の関数がなければ `UNDEFINED FUNCTION`。
 - プロパティの書き方は BASIC の命令と関数の形にした（`OK.TEXT = "X"` のような書き方は文法の変更が要るため使わない）。
 
 ## 5. プログラムの流れ
@@ -138,8 +148,9 @@ class Slider(Widget):
         ...
 ```
 
-- `PROPERTIES`: `PropertySpec(名前, INT か STR, 初期値, 選べる値)`。共通のプロパティ（3 章）は自動で付く。
+- `PROPERTIES`: `PropertySpec(名前, INT か STR, 初期値, 選べる値, readonly=False)`。共通のプロパティ（3 章）は自動で付く。`readonly=True` のプロパティは部品の側で `self.props` に値を入れ、BASIC からは読むだけになる。
+- `check(名前, 値)` は `set` で入れる前に呼ばれ、入れる値を返す（範囲に収めるなど）。受け付けないときは `PropertyError("value", 説明)` を送出する。
 - `EVENTS`: イベント名の並び。`self.fire(イベント名)` で起こす。
-- 入力: `mouse_down` / `mouse_drag` / `mouse_up`（座標はクライアント領域）、`key(ev)`（フォーカスがあるとき。使ったら True）。
+- 入力: `mouse_down` / `mouse_drag` / `mouse_up`（座標はクライアント領域）、`wheel(dy)`（マウスホイール。使ったら True）、`key(ev)`（フォーカスがあるとき。使ったら True）、`update(frame)`（ウィンドウの表示中、毎フレーム）。
 - `changed(名前)` はプロパティが `set` で変わったときに呼ばれる。
-- 描画: `draw(ui, x, y, focused)`。`ui.font` で文字を描き、`ui.frame` でフレーム数（点滅など）を得る。
+- 描画: `draw(ui, x, y, focused)`。`ui.font` で文字を描き、`ui.frame` でフレーム数（点滅など）を得る。描く範囲を絞るときは `pyxel.clip` ではなく `ui.clip(x, y, w, h)` と `ui.unclip()` を使う（ウィンドウの外にはみ出さないように、ウィンドウの範囲と重ねて絞る）。`ui.design` は GUI デザイナで描くときに真になる。

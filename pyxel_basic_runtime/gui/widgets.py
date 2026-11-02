@@ -1,5 +1,6 @@
 """The standard widgets (GUI.md 3): button, check box, radio button, label,
-text field and text area. They are registered like any added widget."""
+text field and text area. They are registered like any added widget.
+The list box, picture box and scroll bars are in their own modules."""
 
 import pyxel
 
@@ -151,9 +152,9 @@ class Label(Widget):
 
     def draw(self, ui, x, y, focused):
         color = self.props["COLOR"] if self.enabled else COLORS["disabled_fg"]
-        pyxel.clip(x, y, self.props["W"], self.props["H"])
+        ui.clip(x, y, self.props["W"], self.props["H"])
         ui.font.draw(x, y + 1, self.props["TEXT"], color)
-        pyxel.clip()
+        ui.unclip()
 
 
 class TextEditing(Widget):
@@ -299,7 +300,7 @@ class TextEditing(Widget):
         self.scroll_x = min(max(self.scroll_x, caret_x - inner_w + 1), caret_x)
         self.scroll_y = min(max(self.scroll_y, line - rows + 1), line)
         top = y + INNER_PAD if self.MULTI_LINE else y + (h - LINE_H) // 2 + 1
-        pyxel.clip(x + 1, y + 1, w - 2, h - 2)
+        ui.clip(x + 1, y + 1, w - 2, h - 2)
         for i in range(rows):
             n = self.scroll_y + i
             if n < len(lines):
@@ -307,7 +308,7 @@ class TextEditing(Widget):
         if focused and ((ui.frame - self.blink_start) // BLINK_FRAMES) % 2 == 0:
             cy = top + (line - self.scroll_y) * LINE_H - 1
             pyxel.rect(x + INNER_PAD - self.scroll_x + caret_x, cy, 1, LINE_H, COLORS["field_fg"])
-        pyxel.clip()
+        ui.unclip()
 
 
 @register_widget

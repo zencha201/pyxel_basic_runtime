@@ -7,6 +7,8 @@ screen calls it when the program can take it.
 
 from collections import deque
 
+import pyxel
+
 from .registry import widget_class
 from .window import GuiWindow, MessageWindow
 
@@ -20,11 +22,32 @@ class GuiError(Exception):
 
 
 class Ui:
-    """What widgets need to draw: the font and the frame count (for the caret)."""
+    """What widgets need to draw: the font, the frame count (for the caret) and clipping.
+
+    ``design`` is True in the GUI designer (widgets may draw a placeholder).
+    """
 
     def __init__(self, font):
         self.font = font
         self.frame = 0
+        self.design = False
+        self.area = None            # the clip rectangle of the window being drawn
+
+    def clip(self, x, y, w, h):
+        """Clip drawing to (x, y, w, h) inside the current window's area."""
+        if self.area is not None:
+            ax, ay, aw, ah = self.area
+            x2, y2 = min(x + w, ax + aw), min(y + h, ay + ah)
+            x, y = max(x, ax), max(y, ay)
+            w, h = max(0, x2 - x), max(0, y2 - y)
+        pyxel.clip(x, y, w, h)
+
+    def unclip(self):
+        """Back to the window's area (or no clipping outside a window)."""
+        if self.area is None:
+            pyxel.clip()
+        else:
+            pyxel.clip(*self.area)
 
 
 class GuiManager:
@@ -159,6 +182,11 @@ class GuiManager:
             if window is not None:
                 window.mouse_up(ev.x, ev.y)
             return window is not None
+        if ev.type == "wheel":
+            window = self._window_at(ev.x, ev.y)
+            if window is not None and window is self.active:
+                window.wheel(ev.x, ev.y, ev.dy)
+            return window is not None
         if ev.type in ("key", "text"):
             self.active.key(ev)
             return True
@@ -173,6 +201,8 @@ class GuiManager:
     # --- drawing ---------------------------------------------------------------
     def update(self):
         self.ui.frame += 1
+        for window in list(self.order):
+            window.update(self.ui.frame)
 
     def draw(self):
         for window in self.order:

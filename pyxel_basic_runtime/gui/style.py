@@ -21,7 +21,13 @@ COLORS = {
     "select_bg": 12, "select_fg": 0,
     "disabled_fg": 13,
     "cursor_fg": 7, "cursor_outline": 0,
+    "scroll_track": 1, "scroll_thumb": 6,
+    "list_sel_bg": 1, "list_sel_fg": 7,
 }
+
+SCROLLBAR_W = 7             # thickness of a scroll bar (and the size of its arrow buttons)
+KEY_HOLD = 20               # frames before a held scroll button repeats
+KEY_REPEAT = 3              # frames between repeats
 
 CHECK = [
     "......1",
@@ -60,6 +66,18 @@ def draw_pattern(x, y, pattern, colors):
 
 def check_mark(x, y, col):
     draw_pattern(x, y, CHECK, {"1": col})
+
+
+def triangle(x, y, direction, col):
+    """A 5 x 3 (or 3 x 5) arrow pointing "up", "down", "left" or "right"; (x, y) is its top-left."""
+    if direction == "up":
+        pyxel.tri(x + 2, y, x, y + 2, x + 4, y + 2, col)
+    elif direction == "down":
+        pyxel.tri(x + 2, y + 2, x, y, x + 4, y, col)
+    elif direction == "left":
+        pyxel.tri(x, y + 2, x + 2, y, x + 2, y + 4, col)
+    else:
+        pyxel.tri(x + 2, y + 2, x, y, x, y + 4, col)
 
 
 def mouse_cursor(x, y):

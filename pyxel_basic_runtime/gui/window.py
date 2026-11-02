@@ -122,6 +122,16 @@ class GuiWindow(Widget):
         self._captured = None
         self._drag = None
 
+    def wheel(self, sx, sy, dy):
+        widget = self.widget_at(*self.to_client(sx, sy))
+        if widget is not None and widget.enabled:
+            widget.wheel(dy)
+
+    def update(self, frame):
+        for widget in self.widgets:
+            if widget.visible:
+                widget.update(frame)
+
     def key(self, ev):
         if ev.type == "key" and ev.key == "tab" and not ev.ctrl and not ev.alt:
             self.focus_next(backward=ev.shift)
@@ -149,12 +159,15 @@ class GuiWindow(Widget):
 
     def draw_widgets(self, origin, show_focus):
         ox, oy = origin
-        pyxel.clip(ox, oy, self.props["W"], self.props["H"])
+        ui = self.ui
+        ui.area = (ox, oy, self.props["W"], self.props["H"])
+        ui.unclip()
         for w in self.widgets:
             if w.visible:
                 wx, wy, _, _ = w.rect
-                w.draw(self.ui, ox + wx, oy + wy, show_focus and w is self.focus)
-        pyxel.clip()
+                w.draw(ui, ox + wx, oy + wy, show_focus and w is self.focus)
+        ui.area = None
+        ui.unclip()
 
 
 class MessageWindow(GuiWindow):

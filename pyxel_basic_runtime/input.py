@@ -1,7 +1,7 @@
 """Keyboard and mouse input of the BASIC screen as a per-frame list of events.
 
 Only what the BASIC screen and the GUI need: editing keys (with key repeat),
-F5 / F6, typed text and the mouse (press, move, release). Tests feed Event
+F5 / F6, typed text and the mouse (press, move, release, wheel). Tests feed Event
 objects directly.
 """
 
@@ -15,6 +15,7 @@ KEY_REPEAT = 3      # frames between repeats
 KEYS = {
     "left": pyxel.KEY_LEFT, "right": pyxel.KEY_RIGHT, "up": pyxel.KEY_UP, "down": pyxel.KEY_DOWN,
     "home": pyxel.KEY_HOME, "end": pyxel.KEY_END,
+    "pageup": pyxel.KEY_PAGEUP, "pagedown": pyxel.KEY_PAGEDOWN,
     "backspace": pyxel.KEY_BACKSPACE, "delete": pyxel.KEY_DELETE,
     "enter": pyxel.KEY_RETURN, "kp_enter": pyxel.KEY_KP_ENTER,
     "escape": pyxel.KEY_ESCAPE, "tab": pyxel.KEY_TAB,
@@ -24,7 +25,7 @@ KEYS = {
 
 @dataclass
 class Event:
-    type: str                   # "key", "text", "mouse_down", "mouse_move" or "mouse_up"
+    type: str                   # "key", "text", "mouse_down", "mouse_move", "mouse_up" or "wheel"
     key: str = ""               # a name of KEYS for "key" ("kp_enter" is reported as "enter")
     text: str = ""
     ctrl: bool = False
@@ -32,6 +33,7 @@ class Event:
     shift: bool = False
     x: int = 0                  # mouse position for mouse events
     y: int = 0
+    dy: int = 0                 # wheel: positive = away from the user
 
 
 class Input:
@@ -52,6 +54,8 @@ class Input:
             events.append(Event("mouse_down", x=mouse[0], y=mouse[1]))
         if pyxel.btnr(pyxel.MOUSE_BUTTON_LEFT):
             events.append(Event("mouse_up", x=mouse[0], y=mouse[1]))
+        if pyxel.mouse_wheel:
+            events.append(Event("wheel", x=mouse[0], y=mouse[1], dy=pyxel.mouse_wheel))
         for name, code in KEYS.items():
             if pyxel.btnp(code, hold=KEY_HOLD, repeat=KEY_REPEAT):
                 key = "enter" if name == "kp_enter" else name

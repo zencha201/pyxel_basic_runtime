@@ -78,9 +78,9 @@ BASIC の言語仕様（文・式・標準関数）は [core/BASIC.md](https://g
 | 命令 | 説明 |
 |---|---|
 | `WINDOW name$,title$,x,y,w,h` | ウィンドウを作る（表示はしない）。w / h はクライアント領域の大きさ |
-| `WIDGET win$,type$,name$,x,y,w,h` | ウィンドウに部品を置く。type$ は `BUTTON` `CHECKBOX` `RADIO` `LABEL` `TEXTFIELD` `TEXTAREA`（と Python で追加した種類） |
+| `WIDGET win$,type$,name$,x,y,w,h` | ウィンドウに部品を置く。type$ は `BUTTON` `CHECKBOX` `RADIO` `LABEL` `TEXTFIELD` `TEXTAREA` `LISTBOX` `PICTUREBOX` `HSCROLLBAR` `VSCROLLBAR`（と Python で追加した種類） |
 | `PROPERTY name$,prop$,v` / `SETPROP name$,prop$,v` | プロパティを設定する（どちらも同じ） |
-| `HANDLER name$,event$,func$` | イベント（`CLICK` `CHANGE` `ENTER` `CLOSE`）で呼ぶ、引数のない関数を設定する |
+| `HANDLER name$,event$,func$` | イベント（`CLICK` `CHANGE` `ENTER` `DRAG` `CLOSE`）で呼ぶ、引数のない関数を設定する |
 | `SHOW win$` / `HIDE win$` | ウィンドウを表示する（いちばん手前へ） / 隠す |
 | `MSGBOX s[,title$]` | メッセージのウィンドウを出し、OK が押されるまで待つ |
 

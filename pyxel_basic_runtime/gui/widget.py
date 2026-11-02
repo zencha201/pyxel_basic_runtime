@@ -18,6 +18,7 @@ class PropertySpec:
     kind: str               # INT or STR (a 1 / 0 flag is INT)
     default: object
     choices: tuple = ()     # allowed values, empty for any
+    readonly: bool = False  # read with GETPROP only; the widget sets it (not saved by the designer)
 
 
 # Every widget has these.
@@ -32,7 +33,8 @@ COMMON_PROPERTIES = (
 
 
 class PropertyError(Exception):
-    """Unknown property (``kind`` "name") or a value of the wrong type ("type")."""
+    """Unknown property (``kind`` "name"), a value of the wrong type ("type"),
+    a value that is not allowed ("value") or a read-only property ("readonly")."""
 
     def __init__(self, kind, detail):
         super().__init__(detail)
@@ -67,14 +69,20 @@ class Widget:
         spec = self.property_specs().get(name)
         if spec is None:
             raise PropertyError("name", name)
+        if spec.readonly:
+            raise PropertyError("readonly", name)
         if (spec.kind == STR) != isinstance(value, str):
             raise PropertyError("type", name)
         if spec.choices and value not in spec.choices:
-            raise PropertyError("type", "%s=%r" % (name, value))
+            raise PropertyError("value", "%s=%r" % (name, value))
         if spec.kind == INT and name in ("W", "H"):
             value = max(1, value)
-        self.props[name] = value
+        self.props[name] = self.check(name, value)
         self.changed(name)
+
+    def check(self, name, value):
+        """The value to store for ``name``; raise PropertyError("value", ...) to refuse it."""
+        return value
 
     def changed(self, name):
         """Called after a property was set (subclasses keep their state in step)."""
@@ -114,12 +122,16 @@ class Widget:
     def mouse_up(self, x, y):
         pass
 
+    def wheel(self, dy):
+        """The mouse wheel over the widget (dy > 0: away from the user). Return True if used."""
+        return False
+
     def key(self, ev):
         """A key or text Event while this widget has the focus. Return True if used."""
         return False
 
     def update(self, frame):
-        pass
+        """Called every frame while the window is shown (e.g. for key repeat of a held button)."""
 
     # --- drawing -----------------------------------------------------------
     def draw(self, ui, x, y, focused):
