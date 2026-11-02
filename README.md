@@ -4,6 +4,7 @@ BASIC コアを Pyxel の上で動かすパッケージです。黒い背景に�
 描画（`CLS` `LINE` `CIRC` `BLT` など）、キー・ゲームパッド・マウスの入力、Pyxel のリソースファイルの読み込みにも対応しています。
 ウィンドウとボタン・チェックボックス・テキストフィールド・リストボックス・スクロールバーなどの部品を使った GUI のプログラムも作れます（部品のイベントで BASIC の関数が呼ばれます）。
 `HTTP` 命令で Web の API に HTTP / HTTPS のリクエストを送り、返ってきた JSON を DICT で受け取れます（[COMMANDS.md](COMMANDS.md) 5 章）。
+`DWRITE` / `DREAD` で DICT の中身をファイル（JSON）に保存し、読み戻せます（[COMMANDS.md](COMMANDS.md) 6 章）。
 
 ※ 本パッケージは Pyxel を使って作った個人のプロジェクトで、Pyxel 公式のものではありません。
 

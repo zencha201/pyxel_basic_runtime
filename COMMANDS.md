@@ -105,6 +105,18 @@ PRINT HTTPSTATUS(); " "; RES$("user.name")
 - フォーム形式で送るときは、ヘッダの DICT に `H$("Content-Type") = "application/x-www-form-urlencoded"` を入れて 5 番目の引数に渡す。
 - つながらないときやタイムアウト（10 秒）は `NETWORK ERROR`。Web ブラウザで動かしたときは使えない（`NETWORK ERROR`）。
 
+## 6. DICT のファイルへの保存と読み込み
+BASIC コアの `DWRITE file$, d` / `DREAD file$, d` を、BASIC 画面では常に使えるようにしている（`install_dict_files`）。仕様は [core/BASIC.md](https://github.com/zencha201/py_basic_core/blob/main/BASIC.md) 6.2。
+
+```basic
+DICT SAVE$
+SAVE$("name") = "TARO"
+DWRITE "save.json", SAVE$        ' JSON で書き出す
+DREAD "save.json", SAVE$         ' 読み戻す
+```
+
+- 相対パスは `LOAD` と同じく、プログラムのファイルがあるフォルダ（`BasicScreen` の `base_dir`）から探す。エディタでまだ保存していない文書を実行したときは、アプリを起動したフォルダになる。
+
 ## 付録. BTN / BTNP のキー名
 大文字小文字は区別しない。
 

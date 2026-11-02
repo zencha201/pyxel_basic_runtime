@@ -11,8 +11,8 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pyxel
-from py_basic_core import (BasicSyntaxError, ReplSession, Runtime, RunState, install_http,
-                           install_standard)
+from py_basic_core import (BasicSyntaxError, ReplSession, Runtime, RunState, install_dict_files,
+                           install_http, install_standard)
 from py_basic_core.terminal import LineEditor, TerminalBuffer
 
 from . import commands, functions
@@ -65,7 +65,7 @@ class BasicResult:
 class BasicScreen:
     def __init__(self, mode, source="", steps_per_frame=20000, max_call_depth=1000, base_dir=None,
                  font=None, input=None):
-        """base_dir: folder that LOAD resolves relative file names against.
+        """base_dir: folder that LOAD, DWRITE and DREAD resolve relative file names against.
         font / input: objects with the interface of font.Font / input.Input; by default
         the font in this package's assets and the keyboard of Pyxel are used.
         """
@@ -81,6 +81,7 @@ class BasicScreen:
         self.runtime = Runtime(PyxelHost(self.terminal), max_call_depth)
         install_standard(self.runtime)
         install_http(self.runtime)              # always on (COMMANDS.md 5)
+        install_dict_files(self.runtime, lambda: self.base_dir)     # COMMANDS.md 6
         commands.install(self.runtime, self)
         functions.install(self.runtime, self)
         self.gui = GuiManager(self.font)
