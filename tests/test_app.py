@@ -6,8 +6,8 @@ import sys
 
 from helpers import key, run_frames, type_line
 
-from pyxel_basic_runtime import DIRECT, PROGRAM
-from pyxel_basic_runtime.app import program_path, read_source
+from retro_basic_runtime import DIRECT, PROGRAM
+from retro_basic_runtime.app import program_path, read_source
 
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -16,7 +16,7 @@ def test_program_path():
     assert program_path(["main.py"]) is None
     assert program_path(["main.py", "game.bas"]) == "game.bas"
     assert program_path(["main.py", "-x", "game.bas"]) == "game.bas"
-    assert program_path(["pyxel", "play", "pyxel_basic_runtime.pyxapp"]) is None
+    assert program_path(["pyxel", "play", "retro_basic_runtime.pyxapp"]) is None
 
 
 def test_read_source_encodings(tmp_path):

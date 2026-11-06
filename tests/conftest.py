@@ -1,4 +1,4 @@
-"""Make pyxel_basic_runtime and py_basic_core importable and start one headless BasicApp.
+"""Make retro_basic_runtime and py_basic_core importable and start one headless BasicApp.
 
 pyxel.init() may be called only once per process: the session's BasicApp
 does it, and every test uses that Pyxel.
@@ -25,7 +25,7 @@ class QuitRecorder:
 
 @pytest.fixture(scope="session")
 def basic_app():
-    from pyxel_basic_runtime.app import BasicApp
+    from retro_basic_runtime.app import BasicApp
     return BasicApp(headless=True, quit=QuitRecorder())
 
 

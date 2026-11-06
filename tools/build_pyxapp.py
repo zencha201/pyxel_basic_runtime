@@ -1,8 +1,8 @@
-"""Build pyxel_basic_runtime.pyxapp (BASIC on its own).
+"""Build retro_basic_runtime.pyxapp (BASIC on its own).
 
     python tools/build_pyxapp.py
 
-main.py and the two packages (pyxel_basic_runtime, and py_basic_core from the
+main.py and the two packages (retro_basic_runtime, and py_basic_core from the
 core/ submodule) are copied to a temporary folder, leaving out caches, and
 "pyxel package" is run there. The result is written to the repository folder.
 """
@@ -14,9 +14,9 @@ import sys
 import tempfile
 
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-APP_NAME = "pyxel_basic_runtime"
+APP_NAME = "retro_basic_runtime"
 PACKAGES = (
-    os.path.join(REPO_DIR, "pyxel_basic_runtime"),
+    os.path.join(REPO_DIR, "retro_basic_runtime"),
     os.path.join(REPO_DIR, "core", "py_basic_core"),
 )
 IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc")

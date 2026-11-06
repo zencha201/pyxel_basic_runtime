@@ -7,7 +7,7 @@ import time
 import pytest
 from helpers import make_screen
 
-from pyxel_basic_runtime import ENDED, STOPPED
+from retro_basic_runtime import ENDED, STOPPED
 
 
 class Handler(http.server.BaseHTTPRequestHandler):

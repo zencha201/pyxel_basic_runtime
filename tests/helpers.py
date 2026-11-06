@@ -1,6 +1,6 @@
 """Drive a BasicScreen with synthetic input."""
 
-from pyxel_basic_runtime import PROGRAM, BasicScreen, Event
+from retro_basic_runtime import PROGRAM, BasicScreen, Event
 
 
 def make_screen(source="", mode=PROGRAM, **kwargs):

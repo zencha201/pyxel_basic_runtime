@@ -18,7 +18,7 @@ BASIC コアを Pyxel の上で動かすパッケージです。黒い背景に�
 BASIC コア（[py_basic_core](https://github.com/zencha201/py_basic_core)）を `core/` にサブモジュールとして取り込んでいるので、`--recursive` を付けて取得してください。
 
 ```sh
-git clone --recursive https://github.com/zencha201/pyxel_basic_runtime.git
+git clone --recursive https://github.com/zencha201/retro_basic_runtime.git
 # すでに取得している場合
 git submodule update --init
 ```
@@ -36,15 +36,15 @@ python main.py              # ダイレクト実行（EXIT で終わります）
 
 ## アプリに組み込む
 
-パッケージは `pyxel_basic_runtime/` フォルダで、BASIC コアの `py_basic_core` を使います。
+パッケージは `retro_basic_runtime/` フォルダで、BASIC コアの `py_basic_core` を使います。
 アプリにこのリポジトリを（サブモジュールなどで）取り込み、リポジトリのフォルダと `core/` を `sys.path` に入れて import します。
 `pyxel.init()` はアプリ側で呼んでください。
 
 ```python
 import sys
-sys.path[:0] = ["pyxel_basic_runtime/core", "pyxel_basic_runtime"]   # 取り込んだリポジトリのフォルダ
+sys.path[:0] = ["retro_basic_runtime/core", "retro_basic_runtime"]   # 取り込んだリポジトリのフォルダ
 
-from pyxel_basic_runtime import PROGRAM, BasicScreen
+from retro_basic_runtime import PROGRAM, BasicScreen
 
 screen = BasicScreen(PROGRAM, source, base_dir=".")
 # 毎フレーム
@@ -60,30 +60,30 @@ if screen.result is not None:      # 終わった（result.kind: ended / error /
 
 | パス | 内容 |
 |---|---|
-| `pyxel_basic_runtime/` | パッケージ |
-| `pyxel_basic_runtime/screen.py` | BASIC 画面 |
-| `pyxel_basic_runtime/commands.py` / `functions.py` | Pyxel 版の命令・関数 |
-| `pyxel_basic_runtime/graphics.py` / `host.py` / `font.py` / `input.py` | グラフィック面・出力先・フォント・キー入力 |
-| `pyxel_basic_runtime/gui/` | GUI（ウィンドウと部品。[GUI.md](GUI.md)） |
-| `pyxel_basic_runtime/app.py` | 単体で動かすときのアプリ |
-| `pyxel_basic_runtime/assets/` | フォント（umplus_j12r.bdf）と利用条件 |
+| `retro_basic_runtime/` | パッケージ |
+| `retro_basic_runtime/screen.py` | BASIC 画面 |
+| `retro_basic_runtime/commands.py` / `functions.py` | Pyxel 版の命令・関数 |
+| `retro_basic_runtime/graphics.py` / `host.py` / `font.py` / `input.py` | グラフィック面・出力先・フォント・キー入力 |
+| `retro_basic_runtime/gui/` | GUI（ウィンドウと部品。[GUI.md](GUI.md)） |
+| `retro_basic_runtime/app.py` | 単体で動かすときのアプリ |
+| `retro_basic_runtime/assets/` | フォント（umplus_j12r.bdf）と利用条件 |
 | `main.py` | 起動スクリプト |
 | `core/` | BASIC コア（[py_basic_core](https://github.com/zencha201/py_basic_core) のサブモジュール。Pyxel に依存しない） |
 | `tests/` | テスト |
-| `tools/build_pyxapp.py` | `pyxel_basic_runtime.pyxapp` の作成 |
+| `tools/build_pyxapp.py` | `retro_basic_runtime.pyxapp` の作成 |
 
 ## テスト・パッケージの作成
 
 ```sh
 pip install pyxel pytest
 python -m pytest                    # このフォルダで実行（コアのテストは core/ で python -m pytest）
-python tools/build_pyxapp.py        # pyxel_basic_runtime.pyxapp を作り直す（コードを修正したら必ず実行）
+python tools/build_pyxapp.py        # retro_basic_runtime.pyxapp を作り直す（コードを修正したら必ず実行）
 ```
 
 ## ライセンス・謝辞
 
 - 本パッケージ: MIT License（[LICENSE](LICENSE)）
 - [Pyxel](https://github.com/kitao/pyxel): 画面描画・入力・フォント描画（MIT License。作者: Takashi Kitao 氏）。本パッケージには含まれません。
-- `pyxel_basic_runtime/assets/umplus_j12r.bdf`: 画面のすべての文字表示に使っているビットマップフォント。Pyxel 同梱のサンプル素材を無改変で同梱しています。作者: COZ（Coji Morishita）氏、Copyright (C) 2002-2004 COZ。利用条件は [pyxel_basic_runtime/assets/FONT_LICENSE.txt](pyxel_basic_runtime/assets/FONT_LICENSE.txt)。
+- `retro_basic_runtime/assets/umplus_j12r.bdf`: 画面のすべての文字表示に使っているビットマップフォント。Pyxel 同梱のサンプル素材を無改変で同梱しています。作者: COZ（Coji Morishita）氏、Copyright (C) 2002-2004 COZ。利用条件は [retro_basic_runtime/assets/FONT_LICENSE.txt](retro_basic_runtime/assets/FONT_LICENSE.txt)。
 
 ゲームエンジン Pyxel を開発・公開されている Takashi Kitao 氏と貢献者の皆さま、日本語のビットマップフォントを自由な条件で公開されている COZ 氏に感謝します。

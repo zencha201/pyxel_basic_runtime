@@ -2,7 +2,7 @@
 
 BASIC プログラムから、ウィンドウとボタンなどの部品（ウィジェット）を使うための仕様です。
 部品のイベント（クリックなど）が起きると、そのイベントに設定した BASIC の関数（ハンドラ）が呼ばれます。
-コードは `pyxel_basic_runtime/gui/` にあります。命令の一覧は [COMMANDS.md](COMMANDS.md) 4 章にもあります。
+コードは `retro_basic_runtime/gui/` にあります。命令の一覧は [COMMANDS.md](COMMANDS.md) 4 章にもあります。
 
 ```basic
 SHOW "MAIN"
@@ -126,7 +126,7 @@ END FUNCTION
 部品の種類は `registry.py` の表で管理しており、Python から追加できる。追加した部品は BASIC の `WIDGET` で使え、エディタの GUI デザイナの部品パネルとプロパティパネルにも表示される。
 
 ```python
-from pyxel_basic_runtime.gui import INT, PropertySpec, Widget, register_widget
+from retro_basic_runtime.gui import INT, PropertySpec, Widget, register_widget
 
 @register_widget
 class Slider(Widget):

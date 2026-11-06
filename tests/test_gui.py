@@ -2,9 +2,9 @@
 
 from helpers import key, make_screen, run_frames, text
 
-from pyxel_basic_runtime import ENDED, ERROR, Event
-from pyxel_basic_runtime.gui import INT, PropertySpec, Widget, register_widget, widget_types
-from pyxel_basic_runtime.gui.style import BAR_H
+from retro_basic_runtime import ENDED, ERROR, Event
+from retro_basic_runtime.gui import INT, PropertySpec, Widget, register_widget, widget_types
+from retro_basic_runtime.gui.style import BAR_H
 
 DESIGN = """
 FUNCTION GUI_DESIGN()
