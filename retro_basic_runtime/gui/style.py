@@ -68,6 +68,12 @@ def check_mark(x, y, col):
     draw_pattern(x, y, CHECK, {"1": col})
 
 
+def fill(x, y, w, h, color):
+    """A background rectangle; nothing for a transparent color (-1)."""
+    if color >= 0:
+        pyxel.rect(x, y, w, h, color)
+
+
 def triangle(x, y, direction, col):
     """A 5 x 3 (or 3 x 5) arrow pointing "up", "down", "left" or "right"; (x, y) is its top-left."""
     if direction == "up":

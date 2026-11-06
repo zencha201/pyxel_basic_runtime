@@ -42,7 +42,7 @@ END FUNCTION
 
 - タイトルバー（タイトルと閉じるボックス `×`）と、部品を置くクライアント領域からなる。
 - `WINDOW` で作った時点では表示されない。`SHOW` で表示し、`HIDE` で隠す。
-- プロパティ: `TITLE`（タイトル）、`X` `Y`（画面上の左上の位置）、`W` `H`（**クライアント領域**の幅と高さ）、`VISIBLE`。部品の位置はクライアント領域の左上からの座標。
+- プロパティ: `TITLE`（タイトル）、`X` `Y`（画面上の左上の位置）、`W` `H`（**クライアント領域**の幅と高さ）、`VISIBLE`、`BGCOLOR`（7。背景色。-1 にすると背景と影を描かず、うしろの BASIC 画面が見える）。部品の位置はクライアント領域の左上からの座標。
 - イベント: `CLOSE`（閉じるボックスが押された。ウィンドウは隠れたあとで呼ばれる）。
 - 表示中のウィンドウは重なり順を持ち、いちばん手前のウィンドウ（アクティブ）がキーボードの入力を受け取る。クリックしたウィンドウが手前に来る。
 - タイトルバーをドラッグすると移動できる。
@@ -53,6 +53,16 @@ END FUNCTION
 
 すべての部品は共通のプロパティ `X` `Y` `W` `H`（位置と大きさ）、`ENABLED`（0 なら操作できず灰色で表示）、`VISIBLE`（0 なら表示しない）を持つ。0 / 1 のプロパティにそれ以外の値を入れると `ILLEGAL FUNCTION CALL`。
 
+**背景色 `BGCOLOR`**: ウィンドウと標準の部品はすべて、背景色のプロパティ `BGCOLOR` を持つ。色は描画命令（`CLS` など）やラベルの `COLOR` と同じ 0〜15 の色番号で、-1 は「背景なし（透明）」（ピクチャボックスの `COLKEY` の -1 と同じ考え方）。それ以外の値は `ILLEGAL FUNCTION CALL`。`SETBGCOLOR` / `GETBGCOLOR()`（4 章）でも変更・取得できる。
+
+| 部品 | `BGCOLOR` の初期値 | 塗る範囲 |
+|---|---|---|
+| ウィンドウ、ボタン | 7 | クライアント領域 / ボタンの面 |
+| テキストフィールド、テキストエリア、リストボックス | 7 | 入力欄・一覧の中 |
+| チェックボックス、ラジオボタン、ラベル | -1（透明。ウィンドウの背景が見える） | 部品の範囲全体 |
+| ピクチャボックス | 0 | 絵のうしろ（絵が小さいときや `COLKEY` の透明色の部分に見える） |
+| 横・縦スクロールバー | 1 | つまみが動く溝（矢印とつまみの色は変わらない） |
+
 | 種類 | プロパティ（初期値） | イベント | 操作 |
 |---|---|---|---|
 | `BUTTON` ボタン | `TEXT`（"BUTTON"） | `CLICK` | クリック（ボタンの上で離す）、Enter、スペース |
@@ -62,7 +72,7 @@ END FUNCTION
 | `TEXTFIELD` テキストフィールド | `TEXT`（""）、`MAXLEN`（0 = 制限なし）、`READONLY`（0 / 1） | `CHANGE`（文字が変わった）、`ENTER`（Enter が押された） | 文字の入力、Backspace / Delete、← → Home End、クリックでカーソル移動 |
 | `TEXTAREA` テキストエリア | `TEXT`（""。改行は `CHR$(10)`）、`READONLY`（0 / 1） | `CHANGE` | テキストフィールドと同じ。Enter で改行、↑ ↓ で行の移動 |
 | `LISTBOX` リストボックス | `ITEMS`（""。項目を `CHR$(10)` で区切る）、`INDEX`（-1。選んだ項目の番号、0 から）、`ITEM`（選んだ項目の文字列）※、`COUNT`（項目の数）※ | `CHANGE`（選んだ項目が変わった）、`ENTER`（ダブルクリック・Enter） | クリックで選ぶ、↑ ↓ PageUp PageDown Home End、マウスホイール・右端のスクロールバーでスクロール |
-| `PICTUREBOX` ピクチャボックス | `IMAGE`（0。イメージバンク 0〜2）、`U` `V`（0。バンクの中の左上）、`COLKEY`（-1。透明色、-1 はなし）、`BGCOLOR`（0。背景色）、`BORDER`（1。枠の 0 / 1）、`MOUSEX` `MOUSEY`（クリックした位置）※ | `CLICK`（押した）、`DRAG`（押したまま動かした） | — |
+| `PICTUREBOX` ピクチャボックス | `IMAGE`（0。イメージバンク 0〜2）、`U` `V`（0。バンクの中の左上）、`COLKEY`（-1。透明色、-1 はなし）、`BORDER`（1。枠の 0 / 1）、`MOUSEX` `MOUSEY`（クリックした位置）※ | `CLICK`（押した）、`DRAG`（押したまま動かした） | — |
 | `HSCROLLBAR` 横スクロールバー / `VSCROLLBAR` 縦スクロールバー | `VALUE`（0）、`MIN`（0）、`MAX`（100）、`STEP`（1。矢印の 1 回の量）、`PAGE`（10。つまみの外をクリックしたときの量・つまみの大きさ） | `CHANGE`（値が変わった） | 矢印（押し続けるとくり返す）、つまみのドラッグ、つまみの外のクリック、← → / ↑ ↓、PageUp PageDown Home End、マウスホイール |
 
 ※ は読み取り専用（`GETPROP` / `GETPROP$` で読むだけ。`SETPROP` すると `ILLEGAL FUNCTION CALL`。GUI デザイナにも表示しない）。
@@ -88,13 +98,16 @@ END FUNCTION
 | `SHOW ウィンドウ名$` | ウィンドウを表示して、いちばん手前にする |
 | `HIDE ウィンドウ名$` | ウィンドウを隠す（`CLOSE` イベントは起きない） |
 | `MSGBOX 文字列[, タイトル$]` | メッセージのウィンドウを出し、OK が押されるまで待つ（`CHR$(10)` で改行） |
+| `SETBGCOLOR 名前$, 色` | ウィンドウ・部品の背景色を変える（0〜15、-1 は透明。`SETPROP 名前$, "BGCOLOR", 色` と同じ） |
 
 | 関数 | 説明 |
 |---|---|
 | `GETPROP(名前$, プロパティ$)` | 数値のプロパティの値 |
 | `GETPROP$(名前$, プロパティ$)` | 文字列のプロパティの値 |
+| `GETBGCOLOR(名前$)` | ウィンドウ・部品の背景色（0〜15、透明なら -1。`GETPROP(名前$, "BGCOLOR")` と同じ） |
 
 - ウィンドウの `VISIBLE` を `SETPROP` で変えると `SHOW` / `HIDE` と同じ。
+- Python で追加した部品は、`bgcolor_property(初期値)` を `PROPERTIES` に入れたときだけ `BGCOLOR` を持つ（7 章。ないときに `SETBGCOLOR` すると `ILLEGAL FUNCTION CALL`）。
 - エラー: ないウィンドウ・部品・種類・プロパティ・イベント、名前の重なり、0 / 1 や 0〜15 などの決まった値以外、読み取り専用のプロパティへの設定は `ILLEGAL FUNCTION CALL`。数値と文字列の取り違え（`GETPROP` で文字列のプロパティを読むなど）は `TYPE MISMATCH`。`HANDLER` の関数がなければ `UNDEFINED FUNCTION`。
 - プロパティの書き方は BASIC の命令と関数の形にした（`OK.TEXT = "X"` のような書き方は文法の変更が要るため使わない）。
 
@@ -148,7 +161,7 @@ class Slider(Widget):
         ...
 ```
 
-- `PROPERTIES`: `PropertySpec(名前, INT か STR, 初期値, 選べる値, readonly=False)`。共通のプロパティ（3 章）は自動で付く。`readonly=True` のプロパティは部品の側で `self.props` に値を入れ、BASIC からは読むだけになる。
+- `PROPERTIES`: `PropertySpec(名前, INT か STR, 初期値, 選べる値, readonly=False)`。共通のプロパティ（3 章）は自動で付く。`readonly=True` のプロパティは部品の側で `self.props` に値を入れ、BASIC からは読むだけになる。背景色を持たせるときは `bgcolor_property(初期値)` を入れ、`draw` で `style.fill(x, y, w, h, self.props["BGCOLOR"])`（-1 なら何も塗らない）を使う。
 - `check(名前, 値)` は `set` で入れる前に呼ばれ、入れる値を返す（範囲に収めるなど）。受け付けないときは `PropertyError("value", 説明)` を送出する。
 - `EVENTS`: イベント名の並び。`self.fire(イベント名)` で起こす。
 - 入力: `mouse_down` / `mouse_drag` / `mouse_up`（座標はクライアント領域）、`wheel(dy)`（マウスホイール。使ったら True）、`key(ev)`（フォーカスがあるとき。使ったら True）、`update(frame)`（ウィンドウの表示中、毎フレーム）。

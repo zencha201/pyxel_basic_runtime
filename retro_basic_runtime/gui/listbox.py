@@ -9,8 +9,8 @@ import pyxel
 
 from ..font import LINE_H
 from .scrollbar import VScrollBar
-from .style import COLORS, SCROLLBAR_W
-from .widget import INT, STR, PropertyError, PropertySpec, Widget
+from .style import COLORS, SCROLLBAR_W, fill
+from .widget import INT, STR, PropertyError, PropertySpec, Widget, bgcolor_property
 
 DOUBLE_CLICK_FRAMES = 20
 TEXT_PAD = 3
@@ -23,6 +23,7 @@ class ListBox(Widget):
         PropertySpec("INDEX", INT, -1),
         PropertySpec("ITEM", STR, "", readonly=True),
         PropertySpec("COUNT", INT, 0, readonly=True),
+        bgcolor_property(COLORS["field_bg"]),
     )
     EVENTS = ("CHANGE", "ENTER")
     DEFAULT_SIZE = (80, 56)
@@ -162,7 +163,7 @@ class ListBox(Widget):
     def draw(self, ui, x, y, focused):
         font = ui.font
         w, h = self.props["W"], self.props["H"]
-        pyxel.rect(x, y, w, h, COLORS["field_bg"])
+        fill(x, y, w, h, self.props["BGCOLOR"])
         pyxel.rectb(x, y, w, h, COLORS["focus"] if focused else COLORS["border"])
         items, index = self.items, self.props["INDEX"]
         fg = COLORS["field_fg"] if self.enabled else COLORS["disabled_fg"]

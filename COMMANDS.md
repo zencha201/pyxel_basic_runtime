@@ -83,10 +83,12 @@ BASIC の言語仕様（文・式・標準関数）は [core/BASIC.md](https://g
 | `HANDLER name$,event$,func$` | イベント（`CLICK` `CHANGE` `ENTER` `DRAG` `CLOSE`）で呼ぶ、引数のない関数を設定する |
 | `SHOW win$` / `HIDE win$` | ウィンドウを表示する（いちばん手前へ） / 隠す |
 | `MSGBOX s[,title$]` | メッセージのウィンドウを出し、OK が押されるまで待つ |
+| `SETBGCOLOR name$,c` | ウィンドウ・部品の背景色を変える。c は 0〜15 の色番号、-1 は透明 |
 
 | 関数 | 説明 |
 |---|---|
 | `GETPROP(name$,prop$)` / `GETPROP$(name$,prop$)` | 数値 / 文字列のプロパティの値 |
+| `GETBGCOLOR(name$)` | ウィンドウ・部品の背景色（透明なら -1） |
 
 - 関数 `GUI_DESIGN()` があれば、メインプログラムより先に呼ばれる（GUI デザイナが作る部分）。
 - ウィンドウを表示したプログラムは、メインプログラムが終わるとイベント待ちになり、`END` か、最後のウィンドウを閉じると終わる。

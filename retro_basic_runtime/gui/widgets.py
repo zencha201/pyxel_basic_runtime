@@ -6,8 +6,8 @@ import pyxel
 
 from ..font import LINE_H
 from .registry import register_widget
-from .style import BOX, COLORS, check_mark
-from .widget import INT, STR, PropertySpec, Widget
+from .style import BOX, COLORS, check_mark, fill
+from .widget import COLOR_CHOICES, INT, STR, PropertySpec, Widget, bgcolor_property
 
 INNER_PAD = 3
 BLINK_FRAMES = 30
@@ -20,7 +20,7 @@ def text_color(widget):
 @register_widget
 class Button(Widget):
     TYPE = "BUTTON"
-    PROPERTIES = (PropertySpec("TEXT", STR, "BUTTON"),)
+    PROPERTIES = (PropertySpec("TEXT", STR, "BUTTON"), bgcolor_property(COLORS["window_bg"]))
     EVENTS = ("CLICK",)
     DEFAULT_SIZE = (60, 16)
     FOCUSABLE = True
@@ -53,7 +53,7 @@ class Button(Widget):
         off = 1 if self.pressed and self._inside else 0
         if not off:
             pyxel.rect(x + 1, y + 1, w, h, COLORS["shadow"])
-        pyxel.rect(x + off, y + off, w, h, COLORS["window_bg"])
+        fill(x + off, y + off, w, h, self.props["BGCOLOR"])
         frame = COLORS["focus"] if focused else COLORS["border"]
         pyxel.rectb(x + off, y + off, w, h, frame)
         if focused:
@@ -66,7 +66,8 @@ class Button(Widget):
 @register_widget
 class CheckBox(Widget):
     TYPE = "CHECKBOX"
-    PROPERTIES = (PropertySpec("TEXT", STR, "CHECK"), PropertySpec("VALUE", INT, 0, (0, 1)))
+    PROPERTIES = (PropertySpec("TEXT", STR, "CHECK"), PropertySpec("VALUE", INT, 0, (0, 1)),
+                  bgcolor_property(-1))
     EVENTS = ("CHANGE",)
     DEFAULT_SIZE = (60, 15)
     FOCUSABLE = True
@@ -86,6 +87,7 @@ class CheckBox(Widget):
         return False
 
     def draw(self, ui, x, y, focused):
+        fill(x, y, self.props["W"], self.props["H"], self.props["BGCOLOR"])
         by = y + (self.props["H"] - BOX) // 2
         pyxel.rect(x, by, BOX, BOX, COLORS["field_bg"])
         pyxel.rectb(x, by, BOX, BOX, COLORS["focus"] if focused else COLORS["border"])
@@ -101,7 +103,7 @@ class RadioButton(Widget):
 
     TYPE = "RADIO"
     PROPERTIES = (PropertySpec("TEXT", STR, "RADIO"), PropertySpec("VALUE", INT, 0, (0, 1)),
-                  PropertySpec("GROUP", STR, "GROUP1"))
+                  PropertySpec("GROUP", STR, "GROUP1"), bgcolor_property(-1))
     EVENTS = ("CHANGE",)
     DEFAULT_SIZE = (60, 15)
     FOCUSABLE = True
@@ -133,6 +135,7 @@ class RadioButton(Widget):
         return False
 
     def draw(self, ui, x, y, focused):
+        fill(x, y, self.props["W"], self.props["H"], self.props["BGCOLOR"])
         by = y + (self.props["H"] - BOX) // 2
         cx, cy = x + BOX // 2, by + BOX // 2
         pyxel.circ(cx, cy, BOX // 2, COLORS["field_bg"])
@@ -147,11 +150,13 @@ class RadioButton(Widget):
 class Label(Widget):
     TYPE = "LABEL"
     PROPERTIES = (PropertySpec("TEXT", STR, "LABEL"),
-                  PropertySpec("COLOR", INT, COLORS["window_fg"], tuple(range(16))))
+                  PropertySpec("COLOR", INT, COLORS["window_fg"], COLOR_CHOICES),
+                  bgcolor_property(-1))
     DEFAULT_SIZE = (60, 13)
 
     def draw(self, ui, x, y, focused):
         color = self.props["COLOR"] if self.enabled else COLORS["disabled_fg"]
+        fill(x, y, self.props["W"], self.props["H"], self.props["BGCOLOR"])
         ui.clip(x, y, self.props["W"], self.props["H"])
         ui.font.draw(x, y + 1, self.props["TEXT"], color)
         ui.unclip()
@@ -290,7 +295,7 @@ class TextEditing(Widget):
     def draw(self, ui, x, y, focused):
         font = ui.font
         w, h = self.props["W"], self.props["H"]
-        pyxel.rect(x, y, w, h, COLORS["field_bg"])
+        fill(x, y, w, h, self.props["BGCOLOR"])
         pyxel.rectb(x, y, w, h, COLORS["focus"] if focused else COLORS["border"])
         lines = self.lines
         line, col = self.caret
@@ -315,7 +320,7 @@ class TextEditing(Widget):
 class TextField(TextEditing):
     TYPE = "TEXTFIELD"
     PROPERTIES = (PropertySpec("TEXT", STR, ""), PropertySpec("MAXLEN", INT, 0),
-                  PropertySpec("READONLY", INT, 0, (0, 1)))
+                  PropertySpec("READONLY", INT, 0, (0, 1)), bgcolor_property(COLORS["field_bg"]))
     EVENTS = ("CHANGE", "ENTER")
     DEFAULT_SIZE = (80, 15)
 
@@ -328,7 +333,8 @@ class TextArea(TextEditing):
     """Several lines; the text uses CHR$(10) between lines."""
 
     TYPE = "TEXTAREA"
-    PROPERTIES = (PropertySpec("TEXT", STR, ""), PropertySpec("READONLY", INT, 0, (0, 1)))
+    PROPERTIES = (PropertySpec("TEXT", STR, ""), PropertySpec("READONLY", INT, 0, (0, 1)),
+                  bgcolor_property(COLORS["field_bg"]))
     EVENTS = ("CHANGE",)
     DEFAULT_SIZE = (100, 45)
     MULTI_LINE = True
