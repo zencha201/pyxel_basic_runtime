@@ -7,8 +7,8 @@ the thumb can be dragged. The list box uses the same class for its own bar.
 
 import pyxel
 
-from .style import COLORS, KEY_HOLD, KEY_REPEAT, SCROLLBAR_W, fill, triangle
-from .widget import INT, PropertySpec, Widget, bgcolor_property
+from .style import COLORS, KEY_HOLD, KEY_REPEAT, SCROLLBAR_W, triangle
+from .widget import INT, PropertySpec, Widget
 
 MIN_THUMB = 6
 
@@ -20,7 +20,6 @@ class ScrollBar(Widget):
         PropertySpec("MAX", INT, 100),
         PropertySpec("STEP", INT, 1),
         PropertySpec("PAGE", INT, 10),
-        bgcolor_property(COLORS["scroll_track"]),        # the track
     )
     EVENTS = ("CHANGE",)
     FOCUSABLE = True
@@ -161,9 +160,9 @@ class ScrollBar(Widget):
     # --- drawing ---------------------------------------------------------------
     def draw(self, ui, x, y, focused):
         w, h = self.props["W"], self.props["H"]
-        thumb = COLORS["scroll_thumb"]
-        arrow = COLORS["scroll_track"] if self.enabled else COLORS["disabled_fg"]
-        fill(x, y, w, h, self.props["BGCOLOR"])
+        track, thumb = COLORS["scroll_track"], COLORS["scroll_thumb"]
+        arrow = track if self.enabled else COLORS["disabled_fg"]
+        pyxel.rect(x, y, w, h, track)
         # The thumb's position relative to the bar's own top-left.
         ts, size = self._thumb()
         ts -= self._span()[0]

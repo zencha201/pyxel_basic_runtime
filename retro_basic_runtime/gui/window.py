@@ -6,8 +6,8 @@ Widget positions are relative to the client area (below the title bar).
 import pyxel
 
 from ..font import LINE_H
-from .style import BAR_H, COLORS, SHADOW, fill
-from .widget import STR, PropertySpec, Widget, bgcolor_property
+from .style import BAR_H, COLORS, SHADOW
+from .widget import STR, PropertySpec, Widget
 from .widgets import Button, Label
 
 CLOSE_BOX_W = 12
@@ -17,7 +17,7 @@ class GuiWindow(Widget):
     """Properties: TITLE, X, Y, W, H (client size), VISIBLE. Event: CLOSE."""
 
     TYPE = "WINDOW"
-    PROPERTIES = (PropertySpec("TITLE", STR, "WINDOW"), bgcolor_property(COLORS["window_bg"]))
+    PROPERTIES = (PropertySpec("TITLE", STR, "WINDOW"),)
     EVENTS = ("CLOSE",)
     DEFAULT_SIZE = (160, 100)
 
@@ -147,10 +147,8 @@ class GuiWindow(Widget):
         x, y, w, h = self.frame_rect
         if at is not None:
             x, y = at
-        bg = self.props["BGCOLOR"]
-        if bg >= 0:                                  # a transparent window has no shadow
-            pyxel.rect(x + SHADOW, y + SHADOW, w, h, COLORS["shadow"])
-        fill(x, y, w, h, bg)
+        pyxel.rect(x + SHADOW, y + SHADOW, w, h, COLORS["shadow"])
+        pyxel.rect(x, y, w, h, COLORS["window_bg"])
         pyxel.rectb(x, y, w, h, COLORS["border"])
         pyxel.rect(x + 1, y + 1, w - 2, BAR_H - 1, COLORS["title_bg" if active else "title_inactive_bg"])
         pyxel.clip(x + 1, y + 1, w - 2 - CLOSE_BOX_W, BAR_H - 1)

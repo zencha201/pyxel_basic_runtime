@@ -10,7 +10,7 @@ from .manager import GuiError, GuiManager
 from .picture import PictureBox
 from .registry import register_widget, widget_class, widget_types
 from .scrollbar import HScrollBar, VScrollBar
-from .widget import INT, STR, PropertyError, PropertySpec, Widget, bgcolor_property
+from .widget import INT, STR, PropertyError, PropertySpec, Widget
 from .window import GuiWindow
 
 for _cls in (ListBox, PictureBox, HScrollBar, VScrollBar):    # the order of the toolbox
@@ -21,5 +21,5 @@ DESIGN_FUNCTION = "GUI_DESIGN"     # called before the main program when it exis
 __all__ = [
     "GuiError", "GuiManager", "GuiWindow", "PropertyError", "PropertySpec", "Widget",
     "ListBox", "PictureBox", "HScrollBar", "VScrollBar",
-    "INT", "STR", "bgcolor_property", "register_widget", "widget_class", "widget_types", "DESIGN_FUNCTION",
+    "INT", "STR", "register_widget", "widget_class", "widget_types", "DESIGN_FUNCTION",
 ]

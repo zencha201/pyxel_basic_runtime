@@ -1,6 +1,5 @@
 """GUI of BASIC programs: windows, widgets, events (GUI.md)."""
 
-import pyxel
 from helpers import key, make_screen, run_frames, text
 
 from retro_basic_runtime import ENDED, ERROR, Event
@@ -308,41 +307,3 @@ def test_errors_of_the_new_widgets():
                                         'SETPROP "L","ITEMS","A"\nSETPROP "L","INDEX",3')
     assert "bad value IMAGE=3" in error('WIDGET "W","PICTUREBOX","P",0,0,50,50\n'
                                         'SETPROP "P","IMAGE",3')
-
-
-def test_background_colors():
-    screen = make_screen('''
-WINDOW "W", "T", 0, 0, 120, 80
-WIDGET "W", "LABEL", "L", 0, 0, 60, 13
-WIDGET "W", "BUTTON", "B", 0, 20, 40, 16
-WIDGET "W", "VSCROLLBAR", "S", 100, 0, 7, 60
-SHOW "W"
-PRINT GETBGCOLOR("W"); GETBGCOLOR("L"); GETBGCOLOR("B"); GETBGCOLOR("S")
-SETBGCOLOR "W", 3
-SETBGCOLOR "L", 10
-SETPROP "B", "BGCOLOR", 8
-PRINT GETBGCOLOR("W"); GETBGCOLOR("L"); GETPROP("B", "BGCOLOR")
-SETBGCOLOR "L", -1
-PRINT GETBGCOLOR("L")
-''')
-    run_frames(screen, 3)
-    assert screen.terminal.text().split()[:3] == ["7-171", "3108", "-1"]
-    screen.draw()
-    w = screen.gui.windows["W"]
-    ox, oy = w.client_origin
-    assert pyxel.pget(ox + 80, oy + 50) == 3                       # the window's client area
-    assert pyxel.pget(ox + 38, oy + 30) == 8                       # inside the button
-    screen.close()
-
-
-def test_background_color_errors():
-    def error(lines):
-        screen = make_screen('WINDOW "W","T",0,0,99,99\n' + lines)
-        run_frames(screen, 3)
-        screen.close()
-        return screen._pending_result.message
-
-    assert "bad value BGCOLOR=16" in error('SETBGCOLOR "W", 16')
-    assert "bad value BGCOLOR=-2" in error('SETBGCOLOR "W", -2')
-    assert "no window or widget X" in error('PRINT GETBGCOLOR("X")')
-    assert "TYPE MISMATCH" in error('SETBGCOLOR "W", "RED"')

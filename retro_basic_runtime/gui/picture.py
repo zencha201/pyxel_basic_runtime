@@ -8,8 +8,10 @@ the point in MOUSEX / MOUSEY (from the box's top-left).
 
 import pyxel
 
-from .style import COLORS, fill
-from .widget import COLOR_CHOICES, INT, PropertySpec, Widget, bgcolor_property
+from .style import COLORS
+from .widget import INT, PropertySpec, Widget
+
+COLORS16 = tuple(range(16))
 
 
 class PictureBox(Widget):
@@ -18,8 +20,8 @@ class PictureBox(Widget):
         PropertySpec("IMAGE", INT, 0, (0, 1, 2)),
         PropertySpec("U", INT, 0),
         PropertySpec("V", INT, 0),
-        PropertySpec("COLKEY", INT, -1, (-1,) + COLOR_CHOICES),
-        bgcolor_property(0),
+        PropertySpec("COLKEY", INT, -1, (-1,) + COLORS16),
+        PropertySpec("BGCOLOR", INT, 0, COLORS16),
         PropertySpec("BORDER", INT, 1, (0, 1)),
         PropertySpec("MOUSEX", INT, 0, readonly=True),
         PropertySpec("MOUSEY", INT, 0, readonly=True),
@@ -56,7 +58,7 @@ class PictureBox(Widget):
     def draw(self, ui, x, y, focused):
         p = self.props
         w, h = p["W"], p["H"]
-        fill(x, y, w, h, p["BGCOLOR"])
+        pyxel.rect(x, y, w, h, p["BGCOLOR"])
         if ui.design:
             # The GUI designer: the image banks hold the editor's images, so show a placeholder.
             pyxel.line(x, y, x + w - 1, y + h - 1, COLORS["disabled_fg"])

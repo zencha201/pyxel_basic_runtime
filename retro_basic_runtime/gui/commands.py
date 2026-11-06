@@ -56,16 +56,6 @@ def install(runtime, gui, check_handlers=True):
                 obj.set(prop, args[2])
         guard(ctx, action)
 
-    def set_bgcolor(ctx, args):
-        """SETBGCOLOR name$, c: the same as SETPROP name$, "BGCOLOR", c (0-15, -1 transparent)"""
-        name, color = name_arg(ctx, args[0]), ctx.expect_int(args[1])
-        guard(ctx, lambda: gui.find(name).set("BGCOLOR", color))
-
-    def get_bgcolor(ctx, args):
-        """GETBGCOLOR(name$): GETPROP(name$, "BGCOLOR")"""
-        name = name_arg(ctx, args[0])
-        return guard(ctx, lambda: gui.find(name).get("BGCOLOR"))
-
     def handler(ctx, args):
         """HANDLER name$, event$, function$"""
         name, event, function = (name_arg(ctx, v) for v in args)
@@ -105,7 +95,6 @@ def install(runtime, gui, check_handlers=True):
         ("WIDGET", widget, 7, 7),
         ("PROPERTY", set_property, 3, 3),
         ("SETPROP", set_property, 3, 3),
-        ("SETBGCOLOR", set_bgcolor, 2, 2),
         ("HANDLER", handler, 3, 3),
         ("SHOW", show, 1, 1),
         ("HIDE", hide, 1, 1),
@@ -114,4 +103,3 @@ def install(runtime, gui, check_handlers=True):
         runtime.register_command(name, fn, lo, hi)
     runtime.register_function("GETPROP", lambda ctx, args: get_property(ctx, args, False), 2, 2)
     runtime.register_function("GETPROP$", lambda ctx, args: get_property(ctx, args, True), 2, 2)
-    runtime.register_function("GETBGCOLOR", get_bgcolor, 1, 1)

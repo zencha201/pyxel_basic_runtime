@@ -21,16 +21,6 @@ class PropertySpec:
     readonly: bool = False  # read with GETPROP only; the widget sets it (not saved by the designer)
 
 
-# Colors are palette numbers 0-15, like the drawing commands; -1 means none (transparent).
-COLOR_CHOICES = tuple(range(16))
-BG_CHOICES = (-1,) + COLOR_CHOICES
-
-
-def bgcolor_property(default):
-    """BGCOLOR: the background color (GUI.md 3), -1 for a transparent background."""
-    return PropertySpec("BGCOLOR", INT, default, BG_CHOICES)
-
-
 # Every widget has these.
 COMMON_PROPERTIES = (
     PropertySpec("X", INT, 0),
